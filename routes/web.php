@@ -30,6 +30,10 @@ Route::get('login', function () {
 Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios');
 
 Route::post('usuarios', [UsuarioController::class, 'store'])->name('guardarusuario');
+Route::get('usuarios-todos', [UsuarioController::class, 'lista']);
+Route::post('usuario-eliminar', [UsuarioController::class, 'destroy']);
+Route::get('usuario-obtener', [UsuarioController::class, 'obtenerusuario']);
+Route::post('usuario-resetear', [UsuarioController::class, 'resetearusuario']);
 
 Route::post('login', [LoginController::class, 'autenticar'])->name('acceder');
 

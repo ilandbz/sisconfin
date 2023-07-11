@@ -80,7 +80,7 @@ class UsuarioController extends Controller
                 'email.unique'       => 'El email ya está en uso.'
             ]);
             $usuario = User::where('id', $request->id)->update([
-                'name'              => $request->role_id,
+                'name'              => $request->name,
                 'nombres'           => $request->nombres,
                 'apellidos'         => $request->apellidos,
                 'email'             => $request->email,
@@ -93,6 +93,12 @@ class UsuarioController extends Controller
         }
     }
 
+    public function lista(){
+        $data['usuarios'] = User::get();
+        return $data;
+    }
+
+
     /**
      * Display the specified resource.
      */
@@ -101,6 +107,11 @@ class UsuarioController extends Controller
         //
     }
 
+
+    public function obtenerusuario(Request $request){
+        $usuario = User::where('id',$request->id)->first();
+        return response()->json($usuario, 200);
+    }
     /**
      * Update the specified resource in storage.
      */
@@ -112,8 +123,23 @@ class UsuarioController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //
+        $usuario = User::where('id',$request->id)->first();
+        $usuario->delete();
+        return response()->json([
+            'ok' => 1,
+            'mensaje' => 'Registro de Usuario Eliminado'
+        ]);
+    }
+    public function resetearusuario(Request $request){
+        $user = User::where('id', $request->id)->first();
+        $user->password = Hash::make($user->name);
+
+        $user->save();
+        return response()->json([
+            'ok' => 1,
+            'mensaje' => 'Clave Reseteado con Exito'
+        ],200);
     }
 }

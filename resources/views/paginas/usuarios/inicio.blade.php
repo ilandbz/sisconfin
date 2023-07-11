@@ -17,7 +17,7 @@
             <div id="bulk-select-replace-element">
               <button class="btn btn-phoenix-success btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#modalusuario">
                 <span class="fas fa-plus" data-fa-transform="shrink-3 down-2"></span>
-                <span class="ms-1">New</span>
+                <span class="ms-1">Nuevo</span>
               </button>
             </div>
             <div class="d-none ms-3" id="bulk-select-actions">
@@ -30,7 +30,7 @@
           </div>
           <div id="tablausuarios" data-list='{"valueNames":["name","nombre","apellidos","email","age"],"page":10,"pagination":true}'>
             <div class="table-responsive mx-n1 px-1">
-              <table class="table table-sm border-top border-200 fs--1 mb-0">
+              <table id="mitabla" class="table table-sm border-top border-200 fs--1 mb-0">
                 <thead>
                   <tr>
                     <th class="sort align-middle ps-3" data-sort="name">Username</th>
@@ -44,15 +44,17 @@
                   @foreach ($usuarios as $item)
                   <tr>
                       <td class="align-middle ps-3 name">{{$item->name}}</td>
-                      <td class="align-middle ps-3 name">{{$item->nombres}}</td>
-                      <td class="align-middle ps-3 name">{{$item->apellidos}}</td>
-                      <td class="align-middle ps-3 name">{{$item->email}}</td>
+                      <td class="align-middle ps-3 nombres">{{$item->nombres}}</td>
+                      <td class="align-middle ps-3 apellidos">{{$item->apellidos}}</td>
+                      <td class="align-middle ps-3 email">{{$item->email}}</td>
                       <td class="align-middle white-space-nowrap text-end pe-0">
                       <div class="font-sans-serif btn-reveal-trigger position-static"><button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs--2" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent"><span class="fas fa-ellipsis-h fs--2"></span></button>
                           <div class="dropdown-menu dropdown-menu-end py-2">
-                              <a class="dropdown-item" href="#!">Ver</a>
+                              <a id="{{$item->id}}" class="dropdown-item btn_editar_usuario" href="#">Editar</a>
                               <div class="dropdown-divider"></div>
                               <a id="{{$item->id}}" class="dropdown-item text-danger btn_eliminar_usuario" href="#">Eliminar</a>
+                              <div class="dropdown-divider"></div>
+                              <a id="{{$item->id}}" class="dropdown-item text-warning btn_resetearclave" href="#">Resetear Clave</a>
                           </div>
                       </div>
                       </td>
@@ -83,54 +85,8 @@
         </div>
       </div>
     </div>
+    @include('paginas.usuarios.modalusuario')
 
-    <div class="modal fade" id="modalusuario" tabindex="-1" aria-labelledby="modalusuarioModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalusuarioModalLabel">Usuario</h5><button class="btn p-1" type="button" data-bs-dismiss="modal" aria-label="Close"><span class="fas fa-times fs--1"></span></button>
-          </div>
-          <form id="usuarioform" name="usuarioform" action="usuarios" method="POST">            
-          <div class="modal-body">
-            @csrf
-              <div class="mb-3">
-                <label class="form-label" for="basic-form-name">UserName</label>
-                <input class="form-control" id="basic-form-name" name="name" type="text" placeholder="Name" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label" for="nombres">Nombres</label>
-                <input class="form-control" id="nombres" name="nombres" type="text" placeholder="Nombres" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label" for="apellidos">Apellidos</label>
-                <input class="form-control" id="apellidos" name="apellidos" type="text" placeholder="Apellidos" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label" for="basic-form-email">Email</label>
-                <input class="form-control" id="basic-form-email" type="email" name="email" placeholder="name@example.com" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label" for="basic-form-password">Password</label>
-                <input class="form-control" id="basic-form-password" type="password" name="password" placeholder="Password" />
-              </div>
-              <div class="mb-3">
-                <label class="form-label" for="basic-form-confirm-password">Confirmar Password</label>
-                <input class="form-control" id="basic-form-confirm-password" type="password" name="password_confirmation" placeholder="Password" />
-              </div>                
-              <div class="mb-3">
-                <label class="form-label" for="basic-form-role_id" name="role_id">Rol</label>
-                <select class="form-select" id="basic-form-role_id" name="role_id" aria-label="Default select example">
-                  @foreach ($roles as $item)
-                      <option value="{{$item->id}}">{{$item->nombre}}</option>
-                  @endforeach
-                </select>
-              </div>
-          </div>
-          <div class="modal-footer"><button class="btn btn-primary" type="submit">Guardar</button><button class="btn btn-outline-primary" type="button" data-bs-dismiss="modal">Cancel</button></div>
-          </form>
-        </div>
-      </div>
-    </div>
 @endsection
 @section('miscript')
 <script
@@ -140,67 +96,228 @@
 <script>
   let csrf_token = $('meta[name="csrf-token"]').attr('content');
 
-  document.querySelectorAll('a.btn_eliminar_usuario').forEach(function(element) {
-    element.addEventListener('click', function() {
-      var usuario_id = this.getAttribute('id');
+    $("#tablausuarios").on('click', '.btn_eliminar_usuario', function() {            
+        var usuario_id = this.getAttribute('id');
+        Swal.fire({
+            icon: 'question',
+            title: 'SISCONFIN',
+            text: 'Esta Seguro de Eliminar el Usuario?',
+            toast: true,
+            position: 'center',
+            showConfirmButton: true,
+            confirmButtonText: 'Si',
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            cancelButtonColor: '#bd2130'
+          }).then(respuesta=>{
+            if(respuesta.isConfirmed){
+              $.ajax({
+                  type:'POST',
+                  dataType:'json',
+                  url: 'usuario-eliminar',
+                  data: {
+                    id: usuario_id,
+                    _token: csrf_token
+                  },
+                  success: function(data) {
+                      if(data.ok==1){
+                        const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                          toast.addEventListener('mouseenter', Swal.stopTimer)
+                          toast.addEventListener('mouseleave', Swal.resumeTimer)
+                          }
+                        })
+
+                        Toast.fire({
+                          icon: 'success',
+                          title: data.mensaje
+                        })
+                        cargar_datatable();
+                      }
+                  }
+              })
+              
+            }
+          });
+    });
+    $("#tablausuarios").on('click', '.btn_editar_usuario', function() {            
+      $('.alert-outline-danger').remove();
+      $("#titulo-modal").text('Modificar Usuario');
+      document.getElementById('grupocontrasenha').classList.add('d-none');
+      var usuario_id = $(this).attr('id'); 
+      $.ajax({
+        url: 'usuario-obtener',
+        method: 'GET', // o GET, PUT, DELETE, según tus necesidades
+        data: {id : usuario_id},
+        dataType: 'json', // o 'text', 'html', según el tipo de respuesta esperada
+        success: function(respuesta) {
+          $('input[name=id]').val(respuesta.id)
+          $('input[name=name]').val(respuesta.nombres)
+          $('input[name=nombres]').val(respuesta.nombres)
+          $('input[name=apellidos]').val(respuesta.apellidos)
+          $('input[name=email]').val(respuesta.email)
+          $('select[name=role_id]').val(respuesta.role_id)
+        },
+        error: function(xhr, status, error) {
+          var mensajeError = "Ocurrió un error en la solicitud AJAX.";
+        
+        // Obtener información detallada del error
+        var mensajeDetallado = "Error: " + error + ", Estado: " + status + ", Descripción: " + xhr.statusText;
+
+        // Mostrar mensaje de error en algún elemento HTML
+        $('#mensaje-error').text(mensajeError);
+        
+        // Mostrar mensaje detallado en la consola
+        console.log(mensajeDetallado);
+        }
+      })
+      $("#modalusuario").modal('show');
+    });    
+
+    $("#tablausuarios").on('click', '.btn_resetearclave', function() {    
+      var usuario_id = $(this).attr('id');         
       Swal.fire({
-          icon: 'question',
-          title: 'SISCONFIN',
-          text: 'Esta Seguro de Eliminar el docente?',
-          toast: true,
-          position: 'center',
-          showConfirmButton: true,
-          confirmButtonText: 'Si',
-          showCancelButton: true,
-          cancelButtonText: 'No',
-          cancelButtonColor: '#bd2130'
-        }).then(respuesta=>{
-          if(respuesta.isConfirmed){
-            $.ajax({
-                type:'POST',
-                dataType:'json',
-                url: 'usuario-eliminar',
-                data: {
-                  id: docente_id,
-                  _token: csrf_token
-                },
-                success: function(data) {
-                    if(data.ok==1){
-                      toastr.success(data.mensaje)
-                      cargar_datatable();
+            icon: 'question',
+            title: 'SISCONFIN',
+            text: 'Esta Seguro de Resetear al Usuario?',
+            toast: true,
+            position: 'center',
+            showConfirmButton: true,
+            confirmButtonText: 'Si',
+            showCancelButton: true,
+            cancelButtonText: 'No',
+            cancelButtonColor: '#bd2130'
+          }).then(respuesta=>{
+            if(respuesta.isConfirmed){
+              $.ajax({
+                  type:'POST',
+                  dataType:'json',
+                  url: 'usuario-resetear',
+                  data: {
+                    id: usuario_id,
+                    _token: csrf_token
+                  },
+                  success: function(data) {
+                    const Toast = Swal.mixin({
+                      toast: true,
+                      position: 'top-end',
+                      showConfirmButton: false,
+                      timer: 3000,
+                      timerProgressBar: true,
+                      didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                        }
+                      })
+                      Toast.fire({
+                        icon: 'success',
+                        title: data.mensaje
+                      })
+                  },
+                  error: function(xhr) {
+                    let res = xhr.responseJSON
+                    if($.isEmptyObject(res) === false) {
+                        $.each(res.errors,function (key, value){
+                            $("input[name='"+key+"']").closest('.mb-3')
+                            .append('<div class="alert alert-outline-danger d-flex align-items-center p-0" role="alert"><span class="fas fa-times-circle text-danger fs-3 me-3"></span><p class="m-0 flex-1">'+ value+ '</p><button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button></div>')
+                            
+                        });
                     }
                 }
+              });
+              
+            }
+          });
+    });    
+
+    document.getElementById('usuarioform').addEventListener('submit', function (event) {
+      event.preventDefault(); // Evita que el formulario se envíe normalmente
+      var form = document.getElementById('usuarioform');
+      $.ajax({
+          type:'POST',
+          url: this.action,
+          data: new FormData(this),
+          processData: false,
+          contentType: false,
+          success: function(data) {
+            form.reset();
+            $("#modalusuario").modal('hide');
+            cargar_datatable();
+            const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.addEventListener('mouseenter', Swal.stopTimer)
+              toast.addEventListener('mouseleave', Swal.resumeTimer)
+              }
+            })
+
+            Toast.fire({
+              icon: 'success',
+              title: data.mensaje
             })
             
-          }
-        });
+            $('.alert-outline-danger').remove();
+          },
+          error: function(xhr) {
+            let res = xhr.responseJSON
+            if($.isEmptyObject(res) === false) {
+                $.each(res.errors,function (key, value){
+                    $("input[name='"+key+"']").closest('.mb-3')
+                    .append('<div class="alert alert-outline-danger d-flex align-items-center p-0" role="alert"><span class="fas fa-times-circle text-danger fs-3 me-3"></span><p class="m-0 flex-1">'+ value+ '</p><button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button></div>')
+                    
+                });
+            }
+        }
+      });
     });
-  });
-  document.getElementById('usuarioform').addEventListener('submit', function (event) {
-        event.preventDefault(); // Evita que el formulario se envíe normalmente
-        var form = document.getElementById('usuarioform');
+
+    function cargar_datatable(){
         $.ajax({
-            type:'POST',
-            url: this.action,
-            data: new FormData(this),
-            processData: false,
-            contentType: false,
-            success: function(data) {
-              form.reset();
-              $("#modalusuario").modal('hide');
-            },
-            error: function(xhr) {
-              let res = xhr.responseJSON
-              if($.isEmptyObject(res) === false) {
-                  $.each(res.errors,function (key, value){
-                      $("input[name='"+key+"']").closest('.mb-3')
-                      .append('<div class="alert alert-outline-danger d-flex align-items-center p-0" role="alert"><span class="fas fa-times-circle text-danger fs-3 me-3"></span><p class="m-0 flex-1">'+ value+ '</p><button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button></div>')
-                      
-                  });
-              }
+          url: 'usuarios-todos',
+          method: 'GET',
+        success: function(response) {
+          // Limpiar el contenido actual de la tabla
+          $('#bulk-select-body').empty();
+            // Iterar sobre los nuevos datos y generar las filas de la tabla
+            $.each(response.usuarios, function(index, item) {
+                var row = '<tr>' +
+                            '<td class="align-middle ps-3 name">' + item.name + '</td>' +
+                            '<td class="align-middle ps-3 nombres">' + item.nombres + '</td>' +
+                            '<td class="align-middle ps-3 apellidos">' + item.apellidos + '</td>' +
+                            '<td class="align-middle ps-3 email">' + item.email + '</td>' +
+                            '<td class="align-middle white-space-nowrap text-end pe-0">' +
+                                '<div class="font-sans-serif btn-reveal-trigger position-static">' +
+                                    '<button class="btn btn-sm dropdown-toggle dropdown-caret-none transition-none btn-reveal fs--2" type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">' +
+                                        '<span class="fas fa-ellipsis-h fs--2"></span>' +
+                                    '</button>' +
+                                    '<div class="dropdown-menu dropdown-menu-end py-2">' +
+                                        '<a id="' + item.id + '" class="dropdown-item btn_editar_usuario" href="#">Editar</a>' +
+                                        '<div class="dropdown-divider"></div>' +
+                                        '<a id="' + item.id + '" class="dropdown-item text-danger btn_eliminar_usuario" href="#">Eliminar</a>' +
+                                        '<div class="dropdown-divider"></div>' +
+                                        '<a id="' + item.id + '" class="dropdown-item text-warning btn_resetearclave" href="#">Resetear Clave</a>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>';
+
+                $('#bulk-select-body').append(row);
+            });
+          },
+          error: function() {
+              console.log('Error al obtener los datos.');
           }
         });
-    });
+    }
 </script>
     
 @endsection

@@ -12,7 +12,6 @@ class LoginController extends Controller
             'email'     => 'required|email',
             'password'  => 'required'
         ]);
-
         $credentials = $request->only('email', 'password');
         if(Auth::attempt($credentials)){
             return redirect()->intended('/');
@@ -22,7 +21,6 @@ class LoginController extends Controller
     public function logout(){
         Auth::logout();
         Session::flush();
-
         return redirect('login');
     }
 }

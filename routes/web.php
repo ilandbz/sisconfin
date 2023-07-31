@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegistroCuentaController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,7 +29,7 @@ Route::get('login', function () {
     return view('login');
 })->name('login');
 
-Route::get('usuarios', [UsuarioController::class, 'index'])->name('usuarios');
+Route::get('usuarios', [UsuarioController::class, 'index'])->middleware('auth')->name('usuarios');
 
 Route::post('usuarios', [UsuarioController::class, 'store'])->name('guardarusuario');
 Route::get('usuarios-todos', [UsuarioController::class, 'lista']);
@@ -35,10 +37,13 @@ Route::post('usuario-eliminar', [UsuarioController::class, 'destroy']);
 Route::get('usuario-obtener', [UsuarioController::class, 'obtenerusuario']);
 Route::post('usuario-resetear', [UsuarioController::class, 'resetearusuario']);
 
+
+Route::get('registro-create', [RegistroCuentaController::class, 'index'])->middleware('auth');
+Route::post('cuenta', [RegistroCuentaController::class, 'store']);
+
 Route::post('login', [LoginController::class, 'autenticar'])->name('acceder');
 
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/', function () {
-    return view('app');
-})->middleware('auth');
+
+Route::get('/', [HomeController::class, 'index'])->middleware('auth');

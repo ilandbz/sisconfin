@@ -11,7 +11,7 @@ class PagoController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**

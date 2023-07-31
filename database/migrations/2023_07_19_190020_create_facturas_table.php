@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('responsables', function (Blueprint $table) {
+        Schema::create('facturas', function (Blueprint $table) {
             $table->id();
+            $table->integer('nro');
+            $table->string('serie');
+            $table->tinyInteger('tiene_igv')->unsigned()->default(1);
+            $table->decimal('monto',9,2);
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('responsables');
+        Schema::dropIfExists('facturas');
     }
 };

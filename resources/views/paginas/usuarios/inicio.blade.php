@@ -89,10 +89,7 @@
 
 @endsection
 @section('miscript')
-<script
-  src="https://code.jquery.com/jquery-3.7.0.min.js"
-  integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
-  crossorigin="anonymous"></script>
+
 <script>
   let csrf_token = $('meta[name="csrf-token"]').attr('content');
 
@@ -235,6 +232,7 @@
           });
     });    
 
+    
     document.getElementById('usuarioform').addEventListener('submit', function (event) {
       event.preventDefault(); // Evita que el formulario se envíe normalmente
       var form = document.getElementById('usuarioform');

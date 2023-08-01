@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 class HomeController extends Controller
 {
     public function index(){
-        return view('app');
+        $data['title']='Pagina Inicial';
+        return view('app', $data);
     }
     
 }

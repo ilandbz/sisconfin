@@ -1,10 +1,9 @@
-<footer class="footer position-absolute">
-    <div class="row g-0 justify-content-between align-items-center h-100">
-      <div class="col-12 col-sm-auto text-center">
-        <p class="mb-0 mt-2 mt-sm-0 text-900">Ing. Figueroa Ferrer Cristian<span class="d-none d-sm-inline-block"></span><span class="d-none d-sm-inline-block mx-1">|</span><br class="d-sm-none">2023 &copy;<a class="mx-1" href="https://themewagon.com">Ilantec</a></p>
-      </div>
-      <div class="col-12 col-sm-auto text-center">
-        <p class="mb-0 text-600">v1.10.0</p>
-      </div>
-    </div>
-  </footer>
+<div>
+    <footer class="main-footer">
+        <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
+        All rights reserved.
+        <div class="float-right d-none d-sm-inline-block">
+          <b>Version</b> 3.2.0
+        </div>
+      </footer>
+</div>
